@@ -150,7 +150,7 @@ export const generateFormValues = (
   const fields = {};
 
   if (banks) {
-    const banksOptions = banks.map(({ bank_name, id }) => ({
+    const banksOptions = banks.map(({ bank_name = 'unnamed', id }) => ({
       value: id,
       label: bank_name,
     }));
