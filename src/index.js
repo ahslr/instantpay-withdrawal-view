@@ -1,6 +1,15 @@
 /**
  * Entrypoint of the Remote Component.
  */
-import { App } from "./App";
+import React from "react";
+import App from "./App";
+import { Provider } from "react-redux";
+import store from "./store";
 
-export default App;
+const Plugin = props => (
+  <Provider store={store}>
+    <App {...props} />
+  </Provider>
+);
+
+export default Plugin;
