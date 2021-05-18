@@ -30,6 +30,22 @@ class App extends Component {
     this.generateFormValues(currency, balance, coins, verification_level, banks, initialBank);
   }
 
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (
+      nextProps.selectedBank !== this.props.selectedBank
+    ) {
+      const { currency, user: { balance, verification_level, bank_account }, coins } = this.props;
+      const banks = bank_account.filter(({ status }) => status === verified_status);
+      let initialBank;
+      if (banks && banks.length === 1) {
+        initialBank = banks[0]['id'];
+      } else {
+        initialBank = nextProps.selectedBank
+      }
+      this.generateFormValues(currency, balance, coins, verification_level, banks, initialBank);
+    }
+  }
+
   onCalculateMax = () => {
     const {
       user: {
