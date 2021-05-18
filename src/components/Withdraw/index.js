@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import math from 'mathjs';
 import { connect } from 'react-redux';
 import {
@@ -15,6 +15,7 @@ import ReviewModalContent from './ReviewModalContent';
 import OtpForm from '../OtpForm';
 import { Image } from '../Image';
 import { Button } from '../Button';
+import { IconTitle } from '../IconTitle';
 import axios from 'axios';
 
 export const FORM_NAME = "FiatWithdrawalForm";
@@ -193,9 +194,16 @@ class Index extends Component {
           {titleSection}
           {
             !has_verified_bank_account && (
-              <div>
-                In order to make a withdrawal you are required to complete your verification which includes verification of your bank details. Please proceed to verification below.
-              </div>
+              <Fragment>
+                <IconTitle
+                  text="Complete verification"
+                  iconId="VERIFICATION_BANK_NEW"
+                  iconPath={ICONS['VERIFICATION_BANK_NEW']}
+                />
+                <div>
+                  In order to make a withdrawal you are required to complete your verification which includes verification of your bank details. Please proceed to verification below.
+                </div>
+              </Fragment>
             )
           }
           {has_verified_bank_account && renderFields(formValues)}
