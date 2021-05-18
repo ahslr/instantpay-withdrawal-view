@@ -115,15 +115,15 @@ export const FieldContent = ({
 
 export const FieldError = ({ error, displayError, className, stringId, strings }) => (
 	<div
-		className={classnames('field-error-content', className, {
+		className={classnames('field-error-content', 'align-items-baseline', className, {
 			'field-error-hidden': !displayError,
 		})}
 	>
 		{error && (
-			<ExclamationCircleFilled className="field_warning_icon" />
-		)}
-		{error && (
-			<span className="field-error-text">{getErrorLocalized(error, strings)}</span>
+			<Fragment>
+				<ExclamationCircleFilled className="field_warning_icon" />
+				<span className="field-error-text">{getErrorLocalized(error, strings)}</span>
+			</Fragment>
 		)}
 	</div>
 );
