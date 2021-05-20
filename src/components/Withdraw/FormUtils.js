@@ -1,3 +1,4 @@
+import React from 'react';
 import math from 'mathjs';
 import numbro from 'numbro';
 import validator from 'validator';
@@ -155,6 +156,27 @@ export const generateFormValues = (
       label: bank_name,
     }));
 
+    let preview
+    if(selectedBank) {
+      const selectedBankObj = banks.find(({ id }) => id === selectedBank );
+      preview = (
+        <div className="d-flex py-4">
+          <div className="bold pl-2">
+            <div>Account owner:</div>
+            <div>Bank name:</div>
+            <div>Bank account number:</div>
+            <div>BSB:</div>
+          </div>
+          <div className="pl-4">
+            <div>{selectedBankObj.account_name || '-'}</div>
+            <div>{selectedBankObj.bank_name || '-'}</div>
+            <div>{selectedBankObj.account_number || '-'}</div>
+            <div>{selectedBankObj.bsb_number || '-'}</div>
+          </div>
+        </div>
+      )
+    }
+
     fields.bank = {
       type: 'select',
       label: 'Bank',
@@ -166,6 +188,7 @@ export const generateFormValues = (
       ishorizontalfield: true,
       disabled: banks.length === 1,
       strings: STRINGS,
+      preview,
     };
   }
 

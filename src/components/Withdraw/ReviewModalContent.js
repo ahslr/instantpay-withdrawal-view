@@ -88,10 +88,10 @@ const ReviewModalContent = ({
 							<div>BSB:</div>
 						</div>
 						<div className="pl-4">
-							<div>{selectedBank.account_name}</div>
-							<div>{selectedBank.bank_name}</div>
-							<div>{selectedBank.account_number}</div>
-							<div>{selectedBank.bsb_number}</div>
+							<div>{selectedBank.account_name || "-"}</div>
+							<div>{selectedBank.bank_name || "-"}</div>
+							<div>{selectedBank.account_number || "-"}</div>
+							<div>{selectedBank.bsb_number || "-"}</div>
 						</div>
 					</div>
 				</div>

@@ -61,6 +61,7 @@ export const FieldContent = ({
 	dateFieldClassName,
 	warning,
 	strings,
+	preview,
 }) => {
 	return (
 		<div>
@@ -105,7 +106,7 @@ export const FieldContent = ({
 				{ishorizontalfield ? (
 					<Fragment>
 						<div className="field-label"></div>
-						<FieldError displayError={displayError} error={error} strings={strings} />
+						<FieldError displayError={displayError} error={error} strings={strings} preview={preview}/>
 					</Fragment>
 				) : null}
 			</div>
@@ -113,11 +114,12 @@ export const FieldContent = ({
 	);
 };
 
-export const FieldError = ({ error, displayError, className, stringId, strings }) => (
+export const FieldError = ({ error, displayError, className, stringId, strings, preview }) => (
 	<div
 		className={classnames('field-error-content', 'align-items-baseline', className, {
-			'field-error-hidden': !displayError,
+			'field-error-hidden': !displayError && !preview,
 		})}
+		style={preview ? { height: 'auto' } : {}}
 	>
 		{error && (
 			<Fragment>
@@ -125,6 +127,13 @@ export const FieldError = ({ error, displayError, className, stringId, strings }
 				<span className="field-error-text">{getErrorLocalized(error, strings)}</span>
 			</Fragment>
 		)}
+		{
+			preview && (
+				<Fragment>
+          {preview}
+				</Fragment>
+			)
+		}
 	</div>
 );
 
@@ -148,6 +157,7 @@ class FieldWrapper extends Component {
 			outlineClassName = '',
 			ishorizontalfield,
 			strings,
+			preview,
 		} = this.props;
 
 		const displayError = !(active || focused) && (visited || touched) && error;
@@ -177,6 +187,7 @@ class FieldWrapper extends Component {
 					ishorizontalfield={ishorizontalfield}
 					dateFieldClassName={className}
 					strings={strings}
+					preview={preview}
 				>
 					{children}
 					{notification && typeof notification === 'object' && (
@@ -190,7 +201,9 @@ class FieldWrapper extends Component {
 					)}
 				</FieldContent>
 				{!ishorizontalfield ? (
-					<FieldError displayError={displayError} error={error} strings={strings}/>
+					<Fragment>
+						<FieldError displayError={displayError} error={error} strings={strings} preview={preview}/>
+					</Fragment>
 				) : null}
 			</div>
 		);

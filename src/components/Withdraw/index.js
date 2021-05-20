@@ -199,8 +199,9 @@ class Index extends Component {
                   text="Complete verification"
                   iconId="VERIFICATION_BANK_NEW"
                   iconPath={ICONS['VERIFICATION_BANK_NEW']}
+                  className="flex-direction-column"
                 />
-                <div>
+                <div className="text-align-center py-4">
                   In order to make a withdrawal you are required to complete your verification which includes verification of your bank details. Please proceed to verification below.
                 </div>
               </Fragment>
