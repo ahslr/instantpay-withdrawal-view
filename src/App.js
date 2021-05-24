@@ -134,7 +134,7 @@ class App extends Component {
 
   render() {
     const { initialValues, formValues } = this.state;
-    const { currency, user: { balance }, children } = this.props;
+    const { currency, user: { balance }, children, token } = this.props;
 
     const balanceAvailable = balance[`${currency}_available`];
 
@@ -143,6 +143,7 @@ class App extends Component {
       ...this.props,
       initialValues,
       formValues,
+      token
     }
 
     if (currency !== 'aud') {

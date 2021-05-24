@@ -67,11 +67,18 @@ class Index extends Component {
   }
 
   onSubmitWithdrawReq = (values) => {
-    const { plugin_url: PLUGIN_URL } = this.props;
+    const { plugin_url: PLUGIN_URL, token } = this.props;
     const { bank, ...rest } = values;
-    return axios.post(`${PLUGIN_URL}/plugins/instantpay/withdraw`, {
-      ...rest,
-      bank_id: bank,
+    return axios({
+      url: `${PLUGIN_URL}/plugins/instantpay/withdraw`,
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: {
+        ...rest,
+        bank_id: bank,
+      }
     })
   }
 
