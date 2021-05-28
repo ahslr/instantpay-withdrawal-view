@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import math from 'mathjs';
 import { Image } from '../Image';
 import { Button } from '../Button';
@@ -31,7 +31,8 @@ const ReviewModalContent = ({
 	onClickAccept,
 	onClickCancel,
 	icons: ICONS,
-	banks
+	banks,
+	activeTab,
 }) => {
 	const { min, fullname, symbol = '' } =
 		coins[currency || BASE_CURRENCY] || DEFAULT_COIN_DATA;
@@ -52,6 +53,48 @@ const ReviewModalContent = ({
 
 	const feePrice = data.fee ? math.number(math.multiply(data.fee, price)) : 0;
 	const fee = data.fee ? data.fee : 0;
+
+	const renderContent = () => {
+    switch (activeTab) {
+      case "bank": {
+        return (
+					<div className="d-flex py-4">
+						<div className="bold pl-2">
+							<div>Account owner:</div>
+							<div>Bank name:</div>
+							<div>Bank account number:</div>
+							<div>BSB:</div>
+						</div>
+						<div className="pl-4">
+							<div>{selectedBank.account_name || "-"}</div>
+							<div>{selectedBank.bank_name || "-"}</div>
+							<div>{selectedBank.account_number || "-"}</div>
+							<div>{selectedBank.bsb_number || "-"}</div>
+						</div>
+					</div>
+				);
+      }
+      case "osko": {
+        return (
+					<div className="d-flex py-4">
+						<div className="bold pl-2">
+							<div>Type:</div>
+							<div>Account name:</div>
+							<div>Email:</div>
+						</div>
+						<div className="pl-4">
+							<div>Osko (PayID)</div>
+							<div>{selectedBank.pay_id_account_name || "-"}</div>
+							<div>{selectedBank.pay_id_email || "-"}</div>
+						</div>
+					</div>
+				);
+      }
+      default: {
+        return "No content";
+      }
+    }
+	}
 
 	return (
 		<div className="d-flex flex-column review-wrapper">
@@ -80,20 +123,7 @@ const ReviewModalContent = ({
 				</div>
 				<div className="review-warning_arrow" />
 				<div className="review-crypto-address" style={{ fontSize: '1.1rem' }}>
-					<div className="d-flex py-4">
-						<div className="bold pl-2">
-							<div>Account owner:</div>
-							<div>Bank name:</div>
-							<div>Bank account number:</div>
-							<div>BSB:</div>
-						</div>
-						<div className="pl-4">
-							<div>{selectedBank.account_name || "-"}</div>
-							<div>{selectedBank.bank_name || "-"}</div>
-							<div>{selectedBank.account_number || "-"}</div>
-							<div>{selectedBank.bsb_number || "-"}</div>
-						</div>
-					</div>
+					{renderContent()}
 				</div>
 			</div>
 			<ButtonSection

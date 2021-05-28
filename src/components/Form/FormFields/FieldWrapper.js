@@ -62,6 +62,7 @@ export const FieldContent = ({
 	warning,
 	strings,
 	preview,
+	hidden,
 }) => {
 	return (
 		<div>
@@ -79,7 +80,7 @@ export const FieldContent = ({
 						</div>
 					)}
 				</div>
-				<div className={classnames('field-content')}>
+				<div className={classnames('field-content', { hidden })}>
 					<div
 						className={classnames(
 							'field-children',
@@ -158,6 +159,7 @@ class FieldWrapper extends Component {
 			ishorizontalfield,
 			strings,
 			preview,
+      hidden,
 		} = this.props;
 
 		const displayError = !(active || focused) && (visited || touched) && error;
@@ -188,6 +190,7 @@ class FieldWrapper extends Component {
 					dateFieldClassName={className}
 					strings={strings}
 					preview={preview}
+					hidden={hidden}
 				>
 					{children}
 					{notification && typeof notification === 'object' && (

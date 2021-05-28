@@ -1,0 +1,17 @@
+:root {
+
+    --calculated_super-pale_label-text-graphics: #00000026;
+}
+
+
+.field-content_preview {
+    border-color: var(--calculated_super-pale_label-text-graphics);
+    border-left: 1px solid;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    margin-left: 1px;
+}
+
+.hidden-field_preview {
+    margin-top: 0 !important;
+}

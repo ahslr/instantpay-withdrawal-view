@@ -11,39 +11,66 @@ import {
 } from './components/Withdraw/FormUtils';
 import WithdrawalForm, { FORM_NAME, selector } from './components/Withdraw';
 
+import "./App.css";
+
 const verified_status = 3;
 
 class App extends Component {
   state = {
     formValues: {},
     initialValues: {},
+    activeTab: 'bank'
   }
 
   componentDidMount() {
     const { currency, user: { balance, verification_level, bank_account }, coins } = this.props;
+    const { activeTab } = this.state;
+
     const banks = bank_account.filter(({ status }) => status === verified_status);
+    const filtered_banks = banks.filter(({ bank_name }) => activeTab === 'osko' ? bank_name === "pay id" : bank_name !== "pay id");
+
     let initialBank;
-    if (banks && banks.length === 1) {
+    if (filtered_banks && filtered_banks.length === 1) {
       initialBank = banks[0]['id'];
     }
 
-    this.generateFormValues(currency, balance, coins, verification_level, banks, initialBank);
+    this.generateFormValues(activeTab, currency, balance, coins, verification_level, banks, initialBank);
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillUpdate(nextProps, nextState) {
+    const { selectedBank } = this.props;
+    const { activeTab } = this.state;
     if (
-      nextProps.selectedBank !== this.props.selectedBank
+      nextProps.selectedBank !== selectedBank ||
+      nextState.activeTab !== activeTab
     ) {
       const { currency, user: { balance, verification_level, bank_account }, coins } = this.props;
       const banks = bank_account.filter(({ status }) => status === verified_status);
+      const filtered_banks = banks.filter(({ bank_name }) => nextState.activeTab === 'osko' ? bank_name === "pay id" : bank_name !== "pay id");
       let initialBank;
-      if (banks && banks.length === 1) {
-        initialBank = banks[0]['id'];
+      if (nextState.activeTab === activeTab) {
+        if (filtered_banks && filtered_banks.length === 1) {
+          initialBank = filtered_banks[0]['id'];
+        } else {
+          initialBank = nextProps.selectedBank
+        }
       } else {
-        initialBank = nextProps.selectedBank
+        if (filtered_banks && filtered_banks.length !== 0) {
+          initialBank = filtered_banks[0]['id'];
+        }
       }
-      this.generateFormValues(currency, balance, coins, verification_level, banks, initialBank);
+
+      this.generateFormValues(nextState.activeTab, currency, balance, coins, verification_level, banks, initialBank);
     }
+  }
+
+  updatePath = (key, value) => {
+    const { router, router: { location: { pathname }} } = this.props;
+    router.push({ pathname, query: { [key]: value } })
+  }
+
+  setActiveTab = (activeTab) => {
+    this.setState({ activeTab });
   }
 
   onCalculateMax = () => {
@@ -90,6 +117,7 @@ class App extends Component {
   };
 
   generateFormValues = (
+    activeTab,
     currency,
     balance,
     coins,
@@ -106,6 +134,8 @@ class App extends Component {
     } = this.props;
     const balanceAvailable = balance[`${currency}_available`];
 
+    const filtered_banks = banks.filter(({ bank_name }) => activeTab === 'osko' ? bank_name === "pay id" : bank_name !== "pay id")
+
     const formValues = generateFormValues(
       constants,
       STRINGS,
@@ -118,8 +148,9 @@ class App extends Component {
       activeLanguage,
       ICONS['BLUE_PLUS'],
       'BLUE_PLUS',
-      banks,
-      selectedBank
+      filtered_banks,
+      selectedBank,
+      activeTab,
     );
 
     const initialValues = generateInitialValues(
@@ -133,8 +164,9 @@ class App extends Component {
   };
 
   render() {
-    const { initialValues, formValues } = this.state;
+    const { initialValues, formValues, activeTab } = this.state;
     const { currency, user: { balance }, children, token } = this.props;
+    const { setActiveTab } = this;
 
     const balanceAvailable = balance[`${currency}_available`];
 
@@ -143,7 +175,9 @@ class App extends Component {
       ...this.props,
       initialValues,
       formValues,
-      token
+      token,
+      setActiveTab,
+      activeTab,
     }
 
     if (currency !== 'aud') {

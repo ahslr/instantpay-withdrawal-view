@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import math from 'mathjs';
+import classnames from 'classnames';
 import { connect } from 'react-redux';
 import {
   reduxForm,
@@ -16,11 +17,23 @@ import OtpForm from '../OtpForm';
 import { Image } from '../Image';
 import { Button } from '../Button';
 import { IconTitle } from '../IconTitle';
+import { Tab } from '../Tab';
 import axios from 'axios';
 
 export const FORM_NAME = "FiatWithdrawalForm";
 export const selector = formValueSelector(FORM_NAME);
 const verified_status = 3;
+
+const TABS = {
+  bank: {
+    iconId: "VERIFICATION_BANK_NEW",
+    title: "Bank"
+  },
+  osko: {
+    iconId: "OSKO_LOGO",
+    title: "Osko (PayID)"
+  }
+};
 
 let errorTimeOut = null;
 
@@ -168,15 +181,219 @@ class Index extends Component {
       });
   };
 
+  renderContent = () => {
+    const { activeTab } = this.props;
+    switch (activeTab) {
+      case "bank": {
+        return this.renderBankContent();
+      }
+      case "osko": {
+        return this.renderOskoContent();
+      }
+      default: {
+        return "No content";
+      }
+    }
+  };
+
+  renderTabs = () => {
+    const { activeTab, setActiveTab, icons: ICONS } = this.props;
+    return(
+      <div
+        className={classnames('custom-tab-wrapper d-flex flex-nowrap flex-row justify-content-start')}
+      >
+        {Object.entries(TABS).map(([key, { title, iconId }]) => {
+          const tabProps = {
+            key: `tab_item-${key}`,
+            className: classnames('tab_item', 'f-1', {
+              'tab_item-active': key === activeTab,
+              pointer: setActiveTab,
+            }),
+          };
+          if (setActiveTab) {
+            tabProps.onClick = () => setActiveTab(key);
+          }
+
+          return (
+            <div {...tabProps}>
+              <Tab
+                icon={ICONS[iconId]}
+                title={title}
+              />
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  renderButtonSection = () => {
+    const { activeTab } = this.props;
+    switch (activeTab) {
+      case "bank": {
+        return this.renderBankButtonSection();
+      }
+      case "osko": {
+        return this.renderOskoButtonSection();
+      }
+      default: {
+        return "No content";
+      }
+    }
+  }
+
+  renderOskoContent = () => {
+    const {
+      formValues,
+      icons: ICONS,
+      user: { bank_account: all_accounts = [] } = {}
+    } = this.props;
+
+    const osko_account = all_accounts.filter(({ bank_name }) => bank_name === "pay id");
+    const verified_osko_account = osko_account.filter(({ status }) => status === verified_status);
+    const has_verified_osko_account = !!verified_osko_account.length;
+
+    return (
+      <Fragment>
+        {
+          !has_verified_osko_account && (
+            <Fragment>
+              <IconTitle
+                text="Complete verification"
+                iconId="VERIFICATION_BANK_NEW"
+                iconPath={ICONS['VERIFICATION_BANK_NEW']}
+                className="flex-direction-column"
+              />
+              <div className="text-align-center py-4">
+                In order to make a withdrawal you are required to complete your verification which includes verification of your bank details. Please proceed to verification below.
+              </div>
+            </Fragment>
+          )
+        }
+        {has_verified_osko_account && renderFields(formValues)}
+      </Fragment>
+    );
+  }
+
+  renderBankContent = () => {
+    const {
+      formValues,
+      icons: ICONS,
+      user: { bank_account: all_accounts = [] } = {}
+    } = this.props;
+
+    const bank_account = all_accounts.filter(({ bank_name }) => bank_name !== "pay id");
+    const verified_bank_account = bank_account.filter(({ status }) => status === verified_status);
+    const has_verified_bank_account = !!verified_bank_account.length;
+
+    return (
+      <Fragment>
+        {
+          !has_verified_bank_account && (
+            <Fragment>
+              <IconTitle
+                text="Complete verification"
+                iconId="VERIFICATION_BANK_NEW"
+                iconPath={ICONS['VERIFICATION_BANK_NEW']}
+                className="flex-direction-column"
+              />
+              <div className="text-align-center py-4">
+                In order to make a withdrawal you are required to complete your verification which includes verification of your bank details. Please proceed to verification below.
+              </div>
+            </Fragment>
+          )
+        }
+        {has_verified_bank_account && renderFields(formValues)}
+      </Fragment>
+    );
+  }
+
+  renderBankButtonSection = () => {
+    const {
+      data,
+      submitting,
+      pristine,
+      valid,
+      router,
+      strings: STRINGS,
+      user: { bank_account: all_accounts = [] } = {}
+    } = this.props;
+
+    const bank_account = all_accounts.filter(({ bank_name }) => bank_name !== "pay id");
+    const verified_bank_account = bank_account.filter(({ status }) => status === verified_status);
+    const has_verified_bank_account = !!verified_bank_account.length;
+
+    return (
+      <Fragment>
+        {
+          !has_verified_bank_account && (
+            <Button
+              label={STRINGS["ACCOUNTS.TAB_VERIFICATION"]}
+              onClick={() => router.push('/verification?initial_tab=bank&initial_bank_tab=bank')}
+              className="mb-3"
+            />
+          )
+        }
+        {
+          has_verified_bank_account && data.bank && (
+            <Button
+              label={STRINGS['WITHDRAWALS_BUTTON_TEXT']}
+              disabled={pristine || submitting || !valid}
+              onClick={this.onOpenDialog}
+              className="mb-3"
+            />
+          )
+        }
+      </Fragment>
+    );
+  }
+
+  renderOskoButtonSection = () => {
+    const {
+      data,
+      submitting,
+      pristine,
+      valid,
+      router,
+      strings: STRINGS,
+      user: { bank_account: all_accounts = [] } = {}
+    } = this.props;
+
+    const osko_account = all_accounts.filter(({ bank_name }) => bank_name === "pay id");
+    const verified_osko_account = osko_account.filter(({ status }) => status === verified_status);
+    const has_verified_osko_account = !!verified_osko_account.length;
+
+    return (
+      <Fragment>
+        {
+          !has_verified_osko_account && (
+            <Button
+              label={STRINGS["ACCOUNTS.TAB_VERIFICATION"]}
+              onClick={() => router.push('/verification?initial_tab=bank&initial_bank_tab=osko')}
+              className="mb-3"
+            />
+          )
+        }
+        {
+          has_verified_osko_account && data.bank && (
+            <Button
+              label={STRINGS['WITHDRAWALS_BUTTON_TEXT']}
+              disabled={pristine || submitting || !valid}
+              onClick={this.onOpenDialog}
+              className="mb-3"
+            />
+          )
+        }
+      </Fragment>
+    );
+  }
+
   render() {
     const {
       user: { bank_account = [] } = {},
-      formValues,
       activeTheme,
       submitting,
-      pristine,
       error,
-      valid,
       currency,
       data,
       coins,
@@ -184,12 +401,11 @@ class Index extends Component {
       titleSection,
       icons: ICONS,
       strings: STRINGS,
-      router,
+      activeTab,
     } = this.props;
     const { dialogIsOpen, dialogOtpOpen } = this.state;
 
     const verified_bank_account = bank_account.filter(({ status }) => status === verified_status);
-    const has_verified_bank_account = !!verified_bank_account.length;
 
     return (
       <div className="withdraw-form-wrapper">
@@ -199,47 +415,16 @@ class Index extends Component {
             wrapperClassName="form_currency-ball"
           />
           {titleSection}
-          {
-            !has_verified_bank_account && (
-              <Fragment>
-                <IconTitle
-                  text="Complete verification"
-                  iconId="VERIFICATION_BANK_NEW"
-                  iconPath={ICONS['VERIFICATION_BANK_NEW']}
-                  className="flex-direction-column"
-                />
-                <div className="text-align-center py-4">
-                  In order to make a withdrawal you are required to complete your verification which includes verification of your bank details. Please proceed to verification below.
-                </div>
-              </Fragment>
-            )
-          }
-          {has_verified_bank_account && renderFields(formValues)}
+          {this.renderTabs()}
+          <div className="py-4">Please note: You can only withdraw to an account in your name.</div>
+          {this.renderContent()}
           {error && <div className="warning_text">{error}</div>}
         </div>
-        {
-          !has_verified_bank_account && (
-            <div className="btn-wrapper">
-              <Button
-                label={STRINGS["ACCOUNTS.TAB_VERIFICATION"]}
-                onClick={() => router.push('/verification')}
-                className="mb-3"
-              />
-            </div>
-          )
-        }
-        {
-          has_verified_bank_account && data.bank && (
-            <div className="btn-wrapper">
-              <Button
-                label={STRINGS['WITHDRAWALS_BUTTON_TEXT']}
-                disabled={pristine || submitting || !valid}
-                onClick={this.onOpenDialog}
-                className="mb-3"
-              />
-            </div>
-        )
-      }
+
+        <div className="btn-wrapper">
+          {this.renderButtonSection()}
+        </div>
+
         <Dialog
           isOpen={dialogIsOpen}
           label="withdraw-modal"
@@ -256,6 +441,7 @@ class Index extends Component {
             />
           ) : !submitting ? (
             <ReviewModalContent
+              activeTab={activeTab}
               banks={verified_bank_account}
               strings={STRINGS}
               coins={coins}

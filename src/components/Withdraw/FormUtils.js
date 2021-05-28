@@ -140,7 +140,8 @@ export const generateFormValues = (
   icon,
   iconId,
   banks,
-  selectedBank
+  selectedBank,
+  activeTab,
 ) => {
   const { fullname, min, increment_unit, withdrawal_limits = {} } =
   coins[symbol] || DEFAULT_COIN_DATA;
@@ -159,27 +160,44 @@ export const generateFormValues = (
     let preview
     if(selectedBank) {
       const selectedBankObj = banks.find(({ id }) => id === selectedBank );
-      preview = (
-        <div className="d-flex py-4">
-          <div className="bold pl-2">
-            <div>Account owner:</div>
-            <div>Bank name:</div>
-            <div>Bank account number:</div>
-            <div>BSB:</div>
+      if (activeTab === "bank") {
+        preview = (
+          <div className="d-flex py-2 field-content_preview">
+            <div className="bold pl-4">
+              <div>Account owner:</div>
+              <div>Bank name:</div>
+              <div>Bank account number:</div>
+              <div>BSB:</div>
+            </div>
+            <div className="pl-4">
+              <div>{selectedBankObj.account_name || '-'}</div>
+              <div>{selectedBankObj.bank_name || '-'}</div>
+              <div>{selectedBankObj.account_number || '-'}</div>
+              <div>{selectedBankObj.bsb_number || '-'}</div>
+            </div>
           </div>
-          <div className="pl-4">
-            <div>{selectedBankObj.account_name || '-'}</div>
-            <div>{selectedBankObj.bank_name || '-'}</div>
-            <div>{selectedBankObj.account_number || '-'}</div>
-            <div>{selectedBankObj.bsb_number || '-'}</div>
+        )
+      } else if (activeTab === "osko") {
+        preview = (
+          <div className="d-flex py-2 field-content_preview hidden-field_preview">
+            <div className="bold pl-4">
+              <div>Account name:</div>
+              <div>Email:</div>
+            </div>
+            <div className="pl-4">
+              <div>{selectedBankObj.pay_id_account_name || '-'}</div>
+              <div>{selectedBankObj.pay_id_email || '-'}</div>
+            </div>
           </div>
-        </div>
-      )
+        )
+      }
     }
+
+    const bankFieldLabel = activeTab === "osko" ? "Osko PayID details" : 'Bank'
 
     fields.bank = {
       type: 'select',
-      label: 'Bank',
+      label: bankFieldLabel,
       placeholder: 'Select a bank',
       validate: [required],
       fullWidth: true,
@@ -189,6 +207,7 @@ export const generateFormValues = (
       disabled: banks.length === 1,
       strings: STRINGS,
       preview,
+      hidden: activeTab === "osko",
     };
   }
 
