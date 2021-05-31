@@ -160,7 +160,7 @@ export const generateFormValues = (
     let preview
     if(selectedBank) {
       const selectedBankObj = banks.find(({ id }) => id === selectedBank );
-      if (activeTab === "bank") {
+      if (activeTab === "bank" && selectedBankObj) {
         preview = (
           <div className="d-flex py-2 field-content_preview">
             <div className="bold pl-4">
@@ -177,7 +177,7 @@ export const generateFormValues = (
             </div>
           </div>
         )
-      } else if (activeTab === "osko") {
+      } else if (activeTab === "osko" && selectedBankObj) {
         preview = (
           <div className="d-flex py-2 field-content_preview hidden-field_preview">
             <div className="bold pl-4">
